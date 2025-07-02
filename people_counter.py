@@ -1,4 +1,8 @@
 # people_counter.py
+# 23초대
+
+import time
+start = time.time()
 
 import torch
 import cv2
@@ -37,3 +41,7 @@ count = (people[:, 5] == 0).sum().item()
 
 # 5. 결과 출력
 print(f"[RESULT] 사람 수: {count}명")
+
+end = time.time()
+
+print(end - start)
