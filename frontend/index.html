@@ -1,0 +1,75 @@
+# frontend/index.html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>동방 인원 카운팅</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f5f7fa;
+      margin: 0;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      margin-top: 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 20px;
+      color: #222;
+    }
+    .loader {
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>동방에 몇 명이 있는지 확인해보세요</h1>
+  <button onclick="countPeople()">동방 인원 확인</button>
+  <div class="loader" id="loader">🔄 인원 분석 중...</div>
+  <p id="result">[결과 없음]</p>
+
+  <script>
+    async function countPeople() {
+      const loader = document.getElementById("loader");
+      const result = document.getElementById("result");
+
+      result.textContent = "";
+      loader.style.display = "block";
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/count");
+        const data = await res.json();
+        loader.style.display = "none";
+
+        result.textContent = `동방에 현재 ${data.count}명 있습니다. (추론 시간: ${data.inference_time}초)`;
+      } catch (err) {
+        loader.style.display = "none";
+        result.textContent = "❌ 오류가 발생했습니다. 서버 상태를 확인해주세요.";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
