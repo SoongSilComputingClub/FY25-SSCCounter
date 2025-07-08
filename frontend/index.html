@@ -18,6 +18,11 @@
     h1 {
       color: #333;
     }
+    #now {
+      font-size: 14px;
+      color: #666;
+      margin-top: -10px;
+    }
     button {
       background-color: #4CAF50;
       color: white;
@@ -50,12 +55,34 @@
 </head>
 <body>
   <h1>동방에 몇 명이 있는지 확인해보세요</h1>
+  <p id="now">📅 현재 시각: 로딩 중...</p>
+
   <button onclick="countPeople()">동방 인원 확인</button>
+  <button onclick="goToLogs()">📈 로그 확인하기</button>
+
   <div class="loader" id="loader">🔄 인원 분석 중...</div>
   <p id="result">[결과 없음]</p>
   <p id="timestamp"></p>
 
   <script>
+    // 실시간 시각 업데이트
+    function updateNowTime() {
+      const nowElem = document.getElementById("now");
+      const now = new Date();
+      const nowString = now.toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+      nowElem.textContent = `📅 현재 시각: ${nowString}`;
+    }
+
+    updateNowTime(); // 최초 실행
+    setInterval(updateNowTime, 1000); // 1초마다 갱신
+
     async function countPeople() {
       const loader = document.getElementById("loader");
       const result = document.getElementById("result");
@@ -88,9 +115,7 @@
         console.error(err);
       }
     }
-  </script>
-  <button onclick="goToLogs()">📈 로그 확인하기</button>
-  <script>
+
     function goToLogs() {
       window.location.href = "/logs";
     }
