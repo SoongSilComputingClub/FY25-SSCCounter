@@ -6,6 +6,11 @@ from ultralytics import YOLO
 import cv2, time, os
 from datetime import datetime
 import csv
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+import pandas as pd
+
+templates = Jinja2Templates(directory="frontend")
 
 app = FastAPI()
 
@@ -62,3 +67,21 @@ def count_people():
     log_result(count, inference_time)  # 🔥 로그 저장 호출
 
     return {"count": count, "inference_time": inference_time}
+
+@app.get("/logs")
+def view_logs(request: Request):
+    log_path = "logs/count_log.csv"
+    if not os.path.exists(log_path):
+        return templates.TemplateResponse("logs.html", {
+            "request": request,
+            "data": []
+        })
+
+    df = pd.read_csv(log_path)
+    df = df.sort_values(by="timestamp", ascending=False)
+    records = df.to_dict(orient="records")
+
+    return templates.TemplateResponse("logs.html", {
+        "request": request,
+        "data": records
+    })
