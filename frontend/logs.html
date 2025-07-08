@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>📊 동방 인원 로그</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 40px;
+      background: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 90%;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+      color: #4CAF50;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>📈 동방 인원 측정 로그</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>측정 시각</th>
+        <th>인원 수</th>
+        <th>추론 시간 (초)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+      <tr>
+        <td>{{ row.timestamp }}</td>
+        <td>{{ row.count }}</td>
+        <td>{{ row.inference_time_sec }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="/">← 메인으로 돌아가기</a>
+</body>
+</html>
