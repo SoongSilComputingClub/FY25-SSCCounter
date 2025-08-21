@@ -65,6 +65,8 @@
   <p id="timestamp"></p>
 
   <script>
+    let socket;
+
     // 실시간 시각 업데이트
     function updateNowTime() {
       const nowElem = document.getElementById("now");
@@ -83,7 +85,38 @@
     updateNowTime(); // 최초 실행
     setInterval(updateNowTime, 1000); // 1초마다 갱신
 
-    async function countPeople() {
+    // WebSocket 연결
+    window.addEventListener("load", () => {
+      socket = new WebSocket("ws://127.0.0.1:8000/v2/ws/client");
+
+      socket.onopen = () => {
+        console.log("✅ WebSocket 연결됨");
+      };
+
+      socket.onmessage = (event) => {
+        const loader = document.getElementById("loader");
+        const result = document.getElementById("result");
+        const timestamp = document.getElementById("timestamp");
+        loader.style.display = "none";
+
+        const data = JSON.parse(event.data);
+
+        if (data.error) {
+          result.textContent = `❌ ${data.error}`;
+        } else {
+          result.textContent = `동방에 현재 ${data.count}명 있습니다. (추론 시간: ${data.inference_time}초)`;
+          const now = new Date();
+          timestamp.textContent = `🕒 확인 시각: ${now.toLocaleString("ko-KR")}`;
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error("WebSocket 에러 발생:", error);
+      };
+    });
+
+    // 버튼 클릭 → capture 요청
+    function countPeople() {
       const loader = document.getElementById("loader");
       const result = document.getElementById("result");
       const timestamp = document.getElementById("timestamp");
@@ -92,27 +125,11 @@
       timestamp.textContent = "";
       loader.style.display = "block";
 
-      try {
-        const res = await fetch("http://127.0.0.1:8000/count");
-        const data = await res.json();
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send("capture");  // 서버에 사진 촬영 요청
+      } else {
         loader.style.display = "none";
-
-        const now = new Date();
-        const timeString = now.toLocaleString("ko-KR", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
-        });
-
-        result.textContent = `동방에 현재 ${data.count}명 있습니다. (추론 시간: ${data.inference_time}초)`;
-        timestamp.textContent = `🕒 확인 시각: ${timeString}`;
-      } catch (err) {
-        loader.style.display = "none";
-        result.textContent = "❌ 오류가 발생했습니다. 서버 상태를 확인해주세요.";
-        console.error(err);
+        result.textContent = "❌ 서버와의 연결이 불안정합니다.";
       }
     }
 
