@@ -1,97 +1,25 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>📊 동방 인원 로그</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 40px;
-      background: #f9f9f9;
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-    #chart-container {
-      width: 90%;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    canvas {
-      background: white;
-      border: 1px solid #ddd;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    a {
-      display: block;
-      text-align: center;
-      margin-top: 30px;
-      color: #4CAF50;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-  <h1>📈 동방 인원 측정 로그</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>📊 동방 인원 로그</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/styles/logs.css" />
+  </head>
+  <body>
+    <h1>📈 동방 인원 측정 로그</h1>
 
-  <div id="chart-container">
-    <canvas id="peopleChart"></canvas>
-  </div>
+    <div id="chart-container">
+      <canvas id="peopleChart"></canvas>
+    </div>
 
-  <a href="/">← 메인으로 돌아가기</a>
+    <a href="/">← 메인으로 돌아가기</a>
 
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- 이 아래에 넣으세요! -->
-  <script>
-    // Jinja2에서 넘긴 데이터를 JS 변수로 변환
-    const rawData = {{ data | tojson | safe }}.reverse();
-    const labels = rawData.map(row => row.timestamp);
-    const counts = rawData.map(row => row.count);
-
-    const dataConfig = {
-      labels: labels,
-      datasets: [{
-        label: '인원 수',
-        data: counts,
-        borderColor: '#4CAF50',
-        backgroundColor: 'rgba(76, 175, 80, 0.2)',
-        tension: 0.2,
-        fill: true,
-        pointRadius: 4
-      }]
-    };
-
-    const config = {
-      type: 'line',
-      data: dataConfig,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: true, position: 'top' },
-          title: { display: true, text: '시간대별 동방 인원 수 변화' }
-        },
-        scales: {
-          x: {
-            title: { display: true, text: '측정 시각' },
-            ticks: { maxRotation: 45, minRotation: 30 }
-          },
-          y: {
-            title: { display: true, text: '인원 수' },
-            beginAtZero: true,
-            suggestedMax: 10
-          }
-        }
-      }
-    };
-
-    new Chart(document.getElementById('peopleChart'), config);
-  </script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      // Jinja2에서 넘겨주는 데이터 (Python -> HTML 컨텍스트)
+      window.rawData = {{ data | tojson | safe }};
+    </script>
+    <script src="/static/scripts/logs.js" defer></script>
+  </body>
 </html>

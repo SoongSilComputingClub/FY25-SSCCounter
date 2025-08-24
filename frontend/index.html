@@ -1,141 +1,26 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>동방 인원 카운팅</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: #f5f7fa;
-      margin: 0;
-    }
-    h1 {
-      color: #333;
-    }
-    #now {
-      font-size: 14px;
-      color: #666;
-      margin-top: -10px;
-    }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      margin-top: 20px;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #result {
-      margin-top: 30px;
-      font-size: 20px;
-      color: #222;
-    }
-    #timestamp {
-      margin-top: 10px;
-      font-size: 16px;
-      color: #555;
-    }
-    .loader {
-      margin-top: 20px;
-      display: none;
-    }
-  </style>
-</head>
-<body>
-  <h1>동방에 몇 명이 있는지 확인해보세요</h1>
-  <p id="now">📅 현재 시각: 로딩 중...</p>
+  <head>
+    <meta charset="UTF-8" />
+    <title>동방 인원 카운팅</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/styles/index.css" />
+  </head>
+  <body>
+    <main role="main" aria-labelledby="page-title">
+      <h1 id="page-title">동방에 몇 명이 있는지 확인해보세요</h1>
+      <p id="now" aria-live="polite">📅 현재 시각: 로딩 중...</p>
 
-  <button onclick="countPeople()">동방 인원 확인</button>
-  <button onclick="goToLogs()">📈 로그 확인하기</button>
+      <div>
+        <button id="btn-count" type="button" aria-label="동방 인원 확인">동방 인원 확인</button>
+        <button id="btn-logs" type="button" aria-label="로그 확인">📈 로그 확인하기</button>
+      </div>
 
-  <div class="loader" id="loader">🔄 인원 분석 중...</div>
-  <p id="result">[결과 없음]</p>
-  <p id="timestamp"></p>
+      <div class="loader" id="loader" aria-live="polite">🔄 인원 분석 중...</div>
+      <p id="result">[결과 없음]</p>
+      <p id="timestamp"></p>
+    </main>
 
-  <script>
-    let socket;
-
-    // 실시간 시각 업데이트
-    function updateNowTime() {
-      const nowElem = document.getElementById("now");
-      const now = new Date();
-      const nowString = now.toLocaleString("ko-KR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      });
-      nowElem.textContent = `📅 현재 시각: ${nowString}`;
-    }
-
-    updateNowTime(); // 최초 실행
-    setInterval(updateNowTime, 1000); // 1초마다 갱신
-
-    // WebSocket 연결
-    window.addEventListener("load", () => {
-      socket = new WebSocket("ws://127.0.0.1:8000/v2/ws/client");
-
-      socket.onopen = () => {
-        console.log("✅ WebSocket 연결됨");
-      };
-
-      socket.onmessage = (event) => {
-        const loader = document.getElementById("loader");
-        const result = document.getElementById("result");
-        const timestamp = document.getElementById("timestamp");
-        loader.style.display = "none";
-
-        const data = JSON.parse(event.data);
-
-        if (data.error) {
-          result.textContent = `❌ ${data.error}`;
-        } else {
-          result.textContent = `동방에 현재 ${data.count}명 있습니다. (추론 시간: ${data.inference_time}초)`;
-          const now = new Date();
-          timestamp.textContent = `🕒 확인 시각: ${now.toLocaleString("ko-KR")}`;
-        }
-      };
-
-      socket.onerror = (error) => {
-        console.error("WebSocket 에러 발생:", error);
-      };
-    });
-
-    // 버튼 클릭 → capture 요청
-    function countPeople() {
-      const loader = document.getElementById("loader");
-      const result = document.getElementById("result");
-      const timestamp = document.getElementById("timestamp");
-
-      result.textContent = "";
-      timestamp.textContent = "";
-      loader.style.display = "block";
-
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send("capture");  // 서버에 사진 촬영 요청
-      } else {
-        loader.style.display = "none";
-        result.textContent = "❌ 서버와의 연결이 불안정합니다.";
-      }
-    }
-
-    function goToLogs() {
-      window.location.href = "/logs";
-    }
-  </script>
-</body>
+    <script src="/static/scripts/index.js" defer></script>
+  </body>
 </html>
